@@ -10,6 +10,23 @@ resource "azurerm_resource_group" "rg" {
   
 }
 
+
+
+
+
+
+
+resource "azurerm_powerbi_embedded" "example" {
+  name                = "fedexpowerbi"
+  location            = var.resource_group_location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku_name            = "A1"
+  administrators      = ["eric.perler@rcggs.com"]
+}
+
+
+
+
 # Create virtual network
 resource "azurerm_virtual_network" "my_terraform_network" {
   name                = "fedex_vnet"
