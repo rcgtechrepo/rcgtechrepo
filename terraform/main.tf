@@ -6,25 +6,10 @@ resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
   #name     = random_pet.rg_name.id
   #name	    = azurerm_resource_group.rg.id
-  name     = "fedex_rg_00001"
+  #name     = "fedex_rg_00001"
+  name      = var.ENV_NAME
   
 }
-
-
-
-
-
-
-
-resource "azurerm_powerbi_embedded" "example" {
-  name                = "fedexpowerbi"
-  location            = var.resource_group_location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku_name            = "A1"
-  administrators      = ["eric.perler@rcggs.com"]
-}
-
-
 
 
 # Create virtual network
