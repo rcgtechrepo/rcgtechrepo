@@ -35,12 +35,12 @@ resource "azurerm_storage_account" "example" {
 }
 
 resource "azurerm_sql_server" "example" {
-  name                         = "mssqlserver"
+  name                         = "rcg_mssqlserver"
   location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   version                      = "12.0"
-  administrator_login          = "mradministrator"
-  administrator_login_password = "thisIsDog11"
+  administrator_login          = "eric.perler@rcggs.com"
+  administrator_login_password = "Cdi6954c"
 
   tags = {
     environment = "production"
