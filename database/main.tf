@@ -32,7 +32,7 @@ resource "azurerm_sql_server" "example" {
 
 
 resource "azurerm_sql_database" "example" {
-  name                = var.ENV_NAME
+  name                = "RG_7380_DATABASE"
 location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_sql_server.example.name
