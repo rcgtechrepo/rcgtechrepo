@@ -15,7 +15,7 @@ resource "azurerm_resource_group" "rg" {
 
 
 resource "azurerm_storage_account" "example" {
-  name                     = var.ENV_NAME
+  name                     = lower(var.ENV_NAME)
   location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   account_tier             = "Standard"
