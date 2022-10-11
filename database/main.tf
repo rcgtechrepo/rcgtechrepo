@@ -44,11 +44,11 @@ location            = var.resource_group_location
 
 module "dbseed" {
   source             = "../../"
-  location           = "${azurerm_resource_group.g0.location}"
-  resource_group     = "${azurerm_resource_group.g0.name}"
-  db_server_fqdn     = "${azurerm_sql_server.server0.fully_qualified_domain_name}"
-  sql_admin_username = "${azurerm_sql_server.server0.administrator_login}"
-  sql_admin_password = "${azurerm_sql_server.server0.administrator_login_password}"
+  location           = "${azurerm_resource_group.rg.location}"
+  resource_group     = "${azurerm_resource_group.rg.name}"
+  db_server_fqdn     = "${azurerm_sql_server.example.fully_qualified_domain_name}"
+  sql_admin_username = "${azurerm_sql_server.example.administrator_login}"
+  sql_admin_password = "${azurerm_sql_server.example.administrator_login_password}"
   db_name            = "db_sample"
   init_script_file   = "db.init.sql"
   log_file           = "db.init.log"
