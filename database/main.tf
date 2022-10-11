@@ -6,8 +6,7 @@ resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
   #name     = random_pet.rg_name.id
   #name	    = azurerm_resource_group.rg.id
-  #name     = "fedex_rg_00001"
-  name      = var.ENV_NAME
+  name     = "FEDEX_RG_SQLSERVER"
 }
 
 
