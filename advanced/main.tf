@@ -29,6 +29,13 @@ module "consul_cluster" {
 
 locals {
   db_server = "${split(".", var.db_server_fqdn)}"
+  server_recordsets = [
+	for i, addr in module.webserver.public_ip_addrs : {
+	name    = format("webserver%02d", i)
+	type    = "A"
+	records = [addr]
+	}
+  ]
 }
 
 resource "azurerm_sql_database" "db" {
