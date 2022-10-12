@@ -1,9 +1,26 @@
-# provider "azurerm" {
-#   subscription_id = "REPLACE-WITH-YOUR-SUBSCRIPTION-ID"
-#   client_id       = "REPLACE-WITH-YOUR-CLIENT-ID"
-#   client_secret   = "REPLACE-WITH-YOUR-CLIENT-SECRET"
-#   tenant_id       = "REPLACE-WITH-YOUR-TENANT-ID"
-# }
+resource "az_vpc" "example" {
+  cidr_block = "10.1.0.0/16"
+}
+
+resource "az_subnet" "example" {
+  vpc_id = az_vpc.example.id
+
+  availability_zone = "us-west-2b"
+  cidr_block        = cidrsubnet(az_vpc.example.cidr_block, 4, 1)
+}
+
+module "network" {
+  source = ".../advanced/modules/az-network"
+
+  base_cidr_block = "10.0.0.0/8"
+}
+
+module "consul_cluster" {
+  source = "../advanced/modules/az-sql-cluster"
+
+  vpc_id     = module.network.vpc_id
+  subnet_ids = module.network.subnet_ids
+}
 
 locals {
   db_server = "${split(".", var.db_server_fqdn)}"
