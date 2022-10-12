@@ -1,12 +1,17 @@
-resource "az_vpc" "example" {
+resource "azurerm_resource_group" "rcg-az" {
+  name                         = "rcgmssqlserver"
+  location            = var.resource_group_location
+  resource_group_name = azurerm_resource_group.rg.name
   cidr_block = "10.1.0.0/16"
 }
 
-resource "az_subnet" "example" {
-  vpc_id = az_vpc.example.id
-
-  availability_zone = "us-west-2b"
-  cidr_block        = cidrsubnet(az_vpc.example.cidr_block, 4, 1)
+resource "azurerm_sql_server" "rcg-az" {
+  name                         = "rcgmssqlserver"
+  location            = var.resource_group_location
+  resource_group_name = azurerm_resource_group.rg.name
+  vpc_id = az_vpc.rcg-az.id
+  availability_zone = "us-east"
+  cidr_block        = cidrsubnet(az_vpc.rcg-az.cidr_block, 4, 1)
 }
 
 module "network" {
