@@ -27,7 +27,7 @@ resource "azurerm_powerbi_embedded" "example" {
 
 
 resource "azurerm_storage_account" "example" {
-  name                     = "examplesa"
+  name                     = "examplesa1"
   location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   account_tier             = "Standard"
@@ -46,15 +46,6 @@ resource "azurerm_sql_server" "example" {
     environment = "production"
   }
 }
-
-
-
-
-
-
-
-
-
 
 
 
