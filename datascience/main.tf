@@ -27,7 +27,7 @@ resource "azurerm_powerbi_embedded" "example" {
 
 
 resource "azurerm_storage_account" "example" {
-  name                     = "examplesa1"
+  name                     = "examplesa"
   location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   account_tier             = "Standard"
@@ -46,6 +46,15 @@ resource "azurerm_sql_server" "example" {
     environment = "production"
   }
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -128,7 +137,7 @@ resource "random_id" "random_id" {
 resource "azurerm_storage_account" "my_storage_account" {
   name                     = "diag${random_id.random_id.hex}"
   location                 = azurerm_resource_group.rg.location
-  resource_group_name      = "exampesa2"
+  resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
