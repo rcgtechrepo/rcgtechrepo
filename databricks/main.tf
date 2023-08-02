@@ -1,3 +1,19 @@
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
+resource "azurerm_databricks_workspace" "example" {
+  name                = "databrickstest"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  sku                 = "standard"
+
+  tags = {
+    Environment = "Production"
+  }
+}
+
 resource "random_pet" "rg_name" {
   prefix = var.resource_group_name_prefix
 }
@@ -9,6 +25,28 @@ resource "azurerm_resource_group" "rg" {
   #name     = "fedex_rg_00001"
   name      = var.ENV_NAME
   
+}
+
+
+
+
+
+
+
+# Create virtual network
+resource "azurerm_virtual_network" "my_terraform_network" {
+  name                = "fedex_vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# Create subnet
+resource "azurerm_subnet" "my_terraform_subnet" {
+  name                 = "fedex_subnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.my_terraform_network.name
+  address_prefixes     = ["10.0.1.0/24"]
 }
 
 # Create public IPs
@@ -68,19 +106,52 @@ resource "random_id" "random_id" {
   byte_length = 8
 }
 
-
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "West Europe"
+# Create storage account for boot diagnostics
+resource "azurerm_storage_account" "my_storage_account" {
+  name                     = "diag${random_id.random_id.hex}"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
 }
 
-resource "azurerm_databricks_workspace" "example" {
-  name                = "databrickstest"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  sku                 = "standard"
+# Create (and display) an SSH key
+resource "tls_private_key" "example_ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
-  tags = {
-    Environment = "Production"
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
+  name                  = "fedex_vm"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
+  size                  = "Standard_DS1_v2"
+
+  os_disk {
+    name                 = "fedex_disk"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  computer_name                   = "myvm"
+  admin_username                  = "azureuser"
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = tls_private_key.example_ssh.public_key_openssh
+  }
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
   }
 }
