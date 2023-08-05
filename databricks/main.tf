@@ -1,3 +1,8 @@
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
 resource "azurerm_databricks_workspace" "example" {
   #name                = "databrickstest"
   name                 =  var.ENV_NAME
