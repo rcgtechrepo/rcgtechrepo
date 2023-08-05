@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "example" {
-  name     = "RCG Databricks"
+  name     = "RCG_Databricks"
   location = "East US"
 }
 
