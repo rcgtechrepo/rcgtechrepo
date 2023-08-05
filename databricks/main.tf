@@ -27,6 +27,15 @@ resource "azurerm_public_ip" "my_terraform_public_ip" {
   allocation_method   = "Dynamic"
 }
 
+resource "azurerm_resource_group" "rg" {
+  location = var.resource_group_location
+  #name     = random_pet.rg_name.id
+  #name	    = azurerm_resource_group.rg.id
+  #name     = "fedex_rg_00001"
+  name      = var.ENV_NAME
+  
+}
+
 
 resource "azurerm_network_interface" "my_terraform_nic" {
   name                = "fedex_nic"
