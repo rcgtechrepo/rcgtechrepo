@@ -19,6 +19,14 @@ resource "random_pet" "rg_name" {
   prefix = var.resource_group_name_prefix
 }
 
+# Create public IPs
+resource "azurerm_public_ip" "my_terraform_public_ip" {
+  name                = "fedex_PublicIP"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
 
 resource "azurerm_network_interface" "my_terraform_nic" {
   name                = "fedex_nic"
