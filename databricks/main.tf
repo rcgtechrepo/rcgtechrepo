@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "example" {
   name     = var.ENV_NAME
-  location = "Central US"
+  location = "West Europe"
 }
 
 resource "azurerm_databricks_workspace" "example" {
