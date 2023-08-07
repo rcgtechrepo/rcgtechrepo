@@ -6,7 +6,7 @@ resource "azurerm_resource_group" "example" {
 resource "azurerm_databricks_workspace" "example" {
   name                = "databrickstest"
   resource_group_name = azurerm_resource_group.example.name
-  location            = var.ENV_NAME
+  location            = azurerm_resource_group.example.location
   sku                 = "standard"
 
   tags = {
