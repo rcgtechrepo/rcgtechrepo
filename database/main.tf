@@ -21,8 +21,8 @@ resource "azurerm_sql_server" "example" {
   location            = var.resource_group_location
   resource_group_name = azurerm_resource_group.rg.name
   version                      = "12.0"
-  administrator_login          = "eric.perler@rcggs.com"
-  administrator_login_password = "Cdi6954c"
+  administrator_login          = "admin"
+  administrator_login_password = "rcgadmin"
   
 
 
