@@ -22,7 +22,7 @@ resource "azurerm_sql_server" "example" {
   resource_group_name = azurerm_resource_group.rg.name
   version                      = "12.0"
   administrator_login          = "rcgadmin"
-  administrator_login_password = "rcgadmin"
+  administrator_login_password = "Cdi6954c"
   
 
 
