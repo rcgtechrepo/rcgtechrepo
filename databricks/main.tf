@@ -31,7 +31,7 @@ resource "azurerm_resource_group" "rg" {
 
 // create PAT token to provision entities within workspace
 resource "databricks_token" "pat" {
-  provider = azurerm_databricks_workspace.example
+  provider = azurerm_databricks_workspace
   comment  = "Terraform Provisioning"
   // 100 day token
   lifetime_seconds = 8640000
