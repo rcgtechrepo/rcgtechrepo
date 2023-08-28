@@ -2,6 +2,10 @@ terraform {
   required_version = ">=0.12"
 
   required_providers {
+   databricks = {
+      source  = "databrickslabs/databricks"
+      version = "0.3.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~>2.0"
@@ -19,10 +23,4 @@ terraform {
 
 provider "azurerm" {
   features {}
-}
-
-provider "databricks" {
-  alias = "created_workspace"
-
-  host = databricks_mws_workspaces.this.workspace_url
 }
