@@ -29,7 +29,26 @@ resource "azurerm_resource_group" "rg" {
 
 
 
+// initialize provider in normal mode
+provider "databricks" {
+  alias = "created_workspace"
 
+  host = databricks_mws_workspaces.this.workspace_url
+}
+
+// create PAT token to provision entities within workspace
+resource "databricks_token" "pat" {
+  provider = databricks.created_workspace
+  comment  = "Terraform Provisioning"
+  // 100 day token
+  lifetime_seconds = 8640000
+}
+
+// output token for other modules
+output "databricks_token" {
+  value     = databricks_token.pat.token_value
+  sensitive = true
+}
 
 
 
