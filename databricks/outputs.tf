@@ -10,3 +10,9 @@ output "tls_private_key" {
   value     = tls_private_key.example_ssh.private_key_pem
   sensitive = true
 }
+
+output "databricks_token" {
+  value     = databricks_token.pat.token_value
+  sensitive = true
+}
+

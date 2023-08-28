@@ -20,3 +20,9 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+provider "databricks" {
+  alias = "created_workspace"
+
+  host = databricks_mws_workspaces.this.workspace_url
+}
