@@ -49,15 +49,15 @@ data "databricks_node_type" "smallest" {
   ]
 }
 data "databricks_spark_version" "latest_lts" {
-  long_term_support = true
+  long_term_support = false
     depends_on = [
     azurerm_databricks_workspace.example
   ]
 }
 resource "databricks_cluster" "dbcselfservice" {
   cluster_name            = "Shared Autoscaling"
-  spark_version           = data.databricks_spark_version.latest_lts.id
-  node_type_id            = data.databricks_node_type.smallest.id
+  spark_version           = "12.2.x-scala2.12" //data.databricks_spark_version.latest_lts.id
+  node_type_id            = "Standard_F4" //data.databricks_node_type.smallest.id
   autotermination_minutes = 20
   autoscale {
     min_workers = 1
