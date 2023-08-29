@@ -91,5 +91,3 @@ resource "databricks_group_member" "i-am-admin" {
     resource.azurerm_databricks_workspace.example
   ]
 }
-Output:
-
