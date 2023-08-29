@@ -15,12 +15,12 @@ provider "databricks" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "databricks_rg"
+  name     = var.ENV_NAME
   location = "East US"
 }
 
 resource "azurerm_databricks_workspace" "example" {
-  name                        = "DBW-ansuman"
+  name                        = var.ENV_NAME //"DBW-${var.ENV_NAME}"
   resource_group_name         = azurerm_resource_group.example.name
   location                    = azurerm_resource_group.example.location
   sku                         = "premium"
@@ -42,7 +42,8 @@ resource "azurerm_databricks_workspace" "example" {
     Pricing     = "Standard"
   }
 }
-data "databricks_node_type" "smallest" {
+
+/*data "databricks_node_type" "smallest" {
   local_disk = true
     depends_on = [
     azurerm_databricks_workspace.example
@@ -53,37 +54,46 @@ data "databricks_spark_version" "latest_lts" {
     depends_on = [
     azurerm_databricks_workspace.example
   ]
-}
+}*/
+
 resource "databricks_cluster" "dbcselfservice" {
   cluster_name            = "Shared Autoscaling"
   spark_version           = "12.2.x-scala2.12" //data.databricks_spark_version.latest_lts.id
   node_type_id            = "Standard_F4" //data.databricks_node_type.smallest.id
   autotermination_minutes = 20
   autoscale {
-    min_workers = 1
-    max_workers = 1
+    min_workers = 0
+    max_workers = 0
   }
-  azure_attributes {
+
+   spark_conf = {
+    "spark.master" = "local[*]"        
+    "spark.databricks.cluster.profile" = "singleNode",     
+    "spark.databricks.passthrough.enabled" = true,             
+  }
+
+  /*azure_attributes {
     availability       = "SPOT_AZURE"
     first_on_demand    = 1
     spot_bid_max_price = 100
-  }
+  }*/
   depends_on = [
     azurerm_databricks_workspace.example
   ]
 }
+
 resource "databricks_group" "db-group" {
   display_name               = "adb-users-admin"
-  allow_cluster_create       = true
-  allow_instance_pool_create = true
+  allow_cluster_create       = false
+  allow_instance_pool_create = false
   depends_on = [
     resource.azurerm_databricks_workspace.example
   ]
 }
 
 resource "databricks_user" "dbuser" {
-  display_name     = "Rahul Sharma"
-  user_name        = "example@contoso.com"
+  display_name     = "RCG User"
+  user_name        = "demo_user@rcggs.com"
   workspace_access = true
   depends_on = [
     resource.azurerm_databricks_workspace.example
