@@ -11,8 +11,8 @@ output "tls_private_key" {
   sensitive = true
 }
 
-output "databricks_token" {
+/*output "databricks_token" {
   value     = databricks_token.pat.token_value
   sensitive = true
-}
+}*/
 
