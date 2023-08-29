@@ -1,163 +1,93 @@
-resource "azurerm_resource_group" "example" {
-  name     = var.ENV_NAME
-  location = "East US"
+terraform {
+  required_providers {
+    databricks = {
+      source = "databrickslabs/databricks"
+      version = "0.3.11"
+    }
+  }
+}
+provider "azurerm" {
+  features {}
+}
+provider "databricks" {
+    host = azurerm_databricks_workspace.example.workspace_url
 }
 
 resource "azurerm_databricks_workspace" "example" {
-  name                = var.ENV_NAME
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  sku                 = "standard"
+  name                        = "DBW-ansuman"
+  resource_group_name         = azurerm_resource_group.example.name
+  location                    = azurerm_resource_group.example.location
+  sku                         = "premium"
+  managed_resource_group_name = "ansuman-DBW-managed-without-lb"
+
+  public_network_access_enabled = true
+
+  custom_parameters {
+    no_public_ip        = true
+    public_subnet_name  = azurerm_subnet.public.name
+    private_subnet_name = azurerm_subnet.private.name
+    virtual_network_id  = azurerm_virtual_network.example.id
+
+    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.public.id
+    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.private.id
+  }
 
   tags = {
     Environment = "Production"
+    Pricing     = "Standard"
   }
 }
-
-resource "random_pet" "rg_name" {
-  prefix = var.resource_group_name_prefix
+data "databricks_node_type" "smallest" {
+  local_disk = true
+    depends_on = [
+    azurerm_databricks_workspace.example
+  ]
 }
-
-resource "azurerm_resource_group" "rg" {
-  location = var.resource_group_location
-  #name     = random_pet.rg_name.id
-  #name	    = azurerm_resource_group.rg.id
-  #name     = "db_rg_00001"
-  name      = var.ENV_NAME
-  
+data "databricks_spark_version" "latest_lts" {
+  long_term_support = true
+    depends_on = [
+    azurerm_databricks_workspace.example
+  ]
 }
-
-
-
-/*create PAT token to provision entities within workspace
-resource "databricks_token" "pat" {
-  provider = databricks
-  comment  = "Terraform Provisioning"
-  // 100 day token
-  lifetime_seconds = 8640000
-}*/
-
-
-
-# Create virtual network
-resource "azurerm_virtual_network" "my_terraform_network" {
-  name                = "db_vnet"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-# Create subnet
-resource "azurerm_subnet" "my_terraform_subnet" {
-  name                 = "db_subnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.my_terraform_network.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
-
-# Create public IPs
-resource "azurerm_public_ip" "my_terraform_public_ip" {
-  name                = "db_PublicIP"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
-}
-
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "my_terraform_nsg" {
-  name                = "db_NetworkSecurityGroup"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+resource "databricks_cluster" "dbcselfservice" {
+  cluster_name            = "Shared Autoscaling"
+  spark_version           = data.databricks_spark_version.latest_lts.id
+  node_type_id            = data.databricks_node_type.smallest.id
+  autotermination_minutes = 20
+  autoscale {
+    min_workers = 1
+    max_workers = 7
   }
+  azure_attributes {
+    availability       = "SPOT_AZURE"
+    first_on_demand    = 1
+    spot_bid_max_price = 100
+  }
+  depends_on = [
+    azurerm_databricks_workspace.example
+  ]
+}
+resource "databricks_group" "db-group" {
+  display_name               = "adb-users-admin"
+  allow_cluster_create       = true
+  allow_instance_pool_create = true
+  depends_on = [
+    resource.azurerm_databricks_workspace.example
+  ]
 }
 
-# Create network interface
-resource "azurerm_network_interface" "my_terraform_nic" {
-  name                = "db_nic"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  ip_configuration {
-    name                          = "my_nic_configuration"
-    subnet_id                     = azurerm_subnet.my_terraform_subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip.id
-  }
+resource "databricks_user" "dbuser" {
+  display_name     = "Rahul Sharma"
+  user_name        = "example@contoso.com"
+  workspace_access = true
+  depends_on = [
+    resource.azurerm_databricks_workspace.example
+  ]
 }
-
-# Connect the security group to the network interface
-resource "azurerm_network_interface_security_group_association" "example" {
-  network_interface_id      = azurerm_network_interface.my_terraform_nic.id
-  network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
-}
-
-# Generate random text for a unique storage account name
-resource "random_id" "random_id" {
-  keepers = {
-    # Generate a new ID only when a new resource group is defined
-    resource_group = azurerm_resource_group.rg.name
-  }
-
-  byte_length = 8
-}
-
-# Create storage account for boot diagnostics
-resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "diag${random_id.random_id.hex}"
-  location                 = azurerm_resource_group.rg.location
-  resource_group_name      = azurerm_resource_group.rg.name
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-# Create (and display) an SSH key
-resource "tls_private_key" "example_ssh" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-# Create virtual machine
-resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
-  name                  = "db_vm"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
-  size                  = "Standard_DS1_v2"
-
-  os_disk {
-    name                 = "db_disk"
-    caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
-
-  computer_name                   = "myvm"
-  admin_username                  = "azureuser"
-  disable_password_authentication = true
-
-  admin_ssh_key {
-    username   = "azureuser"
-    public_key = tls_private_key.example_ssh.public_key_openssh
-  }
-
-  boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
-  }
+resource "databricks_group_member" "i-am-admin" {
+  group_id  = databricks_group.db-group.id
+  member_id = databricks_user.dbuser.id
+  depends_on = [
+    resource.azurerm_databricks_workspace.example
+  ]
 }
