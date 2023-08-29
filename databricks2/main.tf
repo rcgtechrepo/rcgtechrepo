@@ -61,7 +61,7 @@ resource "databricks_cluster" "dbcselfservice" {
   autotermination_minutes = 20
   autoscale {
     min_workers = 1
-    max_workers = 7
+    max_workers = 1
   }
   azure_attributes {
     availability       = "SPOT_AZURE"
