@@ -26,7 +26,7 @@ provider "azurerm" {
 }
 
 provider "databricks" {
-  host = "https://accounts.cloud.databricks.com"
+  host = "https://adb-6829372696756496.16.azuredatabricks.net"
   username = "eric.perler@rcggs.com"
   password = "Cdi6954c"
 }
