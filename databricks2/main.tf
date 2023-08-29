@@ -28,14 +28,14 @@ resource "azurerm_databricks_workspace" "example" {
 
   public_network_access_enabled = true
 
-  custom_parameters {
+ // custom_parameters {
   //  no_public_ip        = true
   //  public_subnet_name  = azurerm_subnet.public.name
 //    virtual_network_id  = azurerm_virtual_network.example.id
 
    // public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.public.id
    // private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.private.id
-  }
+ // }
 
   tags = {
     Environment = "Production"
