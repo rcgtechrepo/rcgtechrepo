@@ -24,3 +24,9 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+provider "databricks" {
+  host = "https://accounts.cloud.databricks.com"
+  username = "eric.perler@rcggs.com"
+  password = "Cdi6954c"
+}
