@@ -12,4 +12,3 @@ variable "ENV_NAME" {
     type        = string
     description = "This is an example input variable using env variables."
 }
-
