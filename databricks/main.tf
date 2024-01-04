@@ -27,8 +27,6 @@ resource "azurerm_resource_group" "rg" {
   
 }
 
-
-
 /*create PAT token to provision entities within workspace
 resource "databricks_token" "pat" {
   provider = databricks
@@ -36,7 +34,6 @@ resource "databricks_token" "pat" {
   // 100 day token
   lifetime_seconds = 8640000
 }*/
-
 
 
 # Create virtual network
